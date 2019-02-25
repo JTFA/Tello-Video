@@ -148,18 +148,12 @@ class TelloUI:
         """
         start a while loop that sends 'command' to tello every 5 second
         """
-
-    """
-        while True:
-            try:
+        while not self.is_program_end:
                 self.tello.send_command('command')
                 time.sleep(5)
-            except KeyboardInterrupt, SystemExit:
-                print('exit')
-                break
                                
         self.onClose()
-    """
+
     def _setQuitWaitingFlag(self):  
         """
         set the variable as TRUE,it will stop computer waiting for response from tello  
