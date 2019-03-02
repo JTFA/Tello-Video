@@ -10,16 +10,17 @@ import os
 import time
 import platform
 
-#image from tello is [720,960,3]
+
+# image from tello is [720,960,3]
 # 720 is vertical piexl
-#960 is horizontal piexl
+# 960 is horizontal piexl
 # x means horizontal
 # y means vertical
 
 class TelloUI:
     """Wrapper class to enable the GUI."""
 
-    def __init__(self,tello,outputpath):
+    def __init__(self, tello, outputpath):
         """
         Initial all the element of the GUI,support by Tkinter
 
@@ -27,31 +28,37 @@ class TelloUI:
 
         Raises:
             RuntimeError: If the Tello rejects the attempt to enter command mode.
-        """        
+        """
 
-        self.tello = tello # videostream device
-        self.outputPath = outputpath # the path that save pictures created by clicking the takeSnapshot button 
+        self.tello = tello  # videostream device
+        self.outputPath = outputpath  # the path that save pictures created by clicking the takeSnapshot button
         self.frame = None  # frame read from h264decoder and used for pose recognition 
-        self.thread = None # thread of the Tkinter mainloop
-        self.stopEvent = None  
-        
+        self.thread = None  # thread of the Tkinter mainloop
+        self.stopEvent = None
+
         # control variables
         self.distance = 0.1  # default distance for 'move' cmd
         self.degree = 30  # default degree for 'cw' or 'ccw' cmd
 
-        #state variables
-        self.state = {'take_off':0,'fly_up':1,'find_ball':2,
-                      'roll_to_ball':3,'fly_straight':4,'fly_finish':5}
+        # state variables
+        self.state = {'take_off': 0, 'fly_up': 1, 'find_ball': 2,
+                      'roll_to_ball': 3, 'fly_straight': 4, 'fly_finish': 5}
         self.state_value = 0
-        self.state_to_call = [self.take_off,self.fly_up,self.find_ball,
-                              self.roll_to_ball,self.fly_straight,self.fly_finish]
+        self.state_to_call = [self.take_off, self.fly_up, self.find_ball,
+                              self.roll_to_ball, self.fly_straight, self.fly_finish]
         self.take_off_time = 0
         self.is_takeoff = False
         self.is_cmd_send = False
 
-        #image variables
-        self.middle_x = 960/2
-        self.middle_y = 720/2
+        self.ball_x = -1
+        self.ball_y = -1
+        self.distance = -1
+        # img record
+        self.is_img_record = False
+        self.img_num = 0
+        # image variables
+        self.middle_x = 960 / 2
+        self.middle_y = 720 / 2
 
         # if the flag is TRUE,the auto-takeoff thread will stop waiting for the response from tello
         self.quit_waiting_flag = False
@@ -59,7 +66,6 @@ class TelloUI:
         # initialize the root window and image panel
         self.root = tki.Tk()
         self.panel = None
-
 
         # create buttons
         self.btn_snapshot = tki.Button(self.root, text="Snapshot!",
@@ -82,56 +88,53 @@ class TelloUI:
         self.thread = threading.Thread(target=self.videoLoop, args=())
         self.thread.start()
 
-        #set a key event
-        self.root.bind('<Key>',self.onKey)
+        # set a key event
+        self.root.bind('<Key>', self.onKey)
         # set a callback to handle when the window is closed
         self.root.wm_title("TELLO Controller")
         self.root.wm_protocol("WM_DELETE_WINDOW", self.onClose)
 
         # the sending_command will send command to tello every 5 seconds
-        self.sending_command_thread = threading.Thread(target = self._sendingCommand)
+        self.sending_command_thread = threading.Thread(target=self._sendingCommand)
+
     def videoLoop(self):
         """
-        The mainloop thread of Tkinter 
+        The mainloop thread of Tkinter
         Raises:
             RuntimeError: To get around a RunTime error that Tkinter throws due to threading.
         """
         try:
-            # start the thread that get GUI image and drwa skeleton 
+            # start the thread that get GUI image and drwa skeleton
             time.sleep(0.5)
             self.sending_command_thread.start()
             while (not self.stopEvent.is_set()) and (not self.is_program_end):
                 system = platform.system()
                 print(self.is_program_end)
-            # read the frame for GUI show
+                # read the frame for GUI show
                 self.frame = self.tello.read()
                 if self.frame is None or self.frame.size == 0:
-                    continue 
+                    continue
 
-            # transfer the format from frame to image         
+                    # transfer the format from frame to image
                 image = Image.fromarray(self.frame)
                 self.commandProcess(image)
-            # we found compatibility problem between Tkinter,PIL and Macos,and it will 
-            # sometimes result the very long preriod of the "ImageTk.PhotoImage" function,
-            # so for Macos,we start a new thread to execute the _updateGUIImage function.
-                if system =="Windows" or system =="Linux":                
+                # we found compatibility problem between Tkinter,PIL and Macos,and it will
+                # sometimes result the very long preriod of the "ImageTk.PhotoImage" function,
+                # so for Macos,we start a new thread to execute the _updateGUIImage function.
+                if system == "Windows" or system == "Linux":
                     self._updateGUIImage(image)
 
                 else:
-                    thread_tmp = threading.Thread(target=self._updateGUIImage,args=(image,))
+                    thread_tmp = threading.Thread(target=self._updateGUIImage, args=(image,))
                     thread_tmp.start()
-                    time.sleep(0.03)                                                            
+                    time.sleep(0.03)
         except RuntimeError, e:
             print("[INFO] caught a RuntimeError")
 
-
-
-
-
-    def _updateGUIImage(self,image):
+    def _updateGUIImage(self, image):
         """
-        Main operation to initial the object of image,and update the GUI panel 
-        """  
+        Main operation to initial the object of image,and update the GUI panel
+        """
         image = ImageTk.PhotoImage(image)
         # if the panel none ,we need to initial it
         if self.panel is None:
@@ -143,27 +146,26 @@ class TelloUI:
             self.panel.configure(image=image)
             self.panel.image = image
 
-            
     def _sendingCommand(self):
         """
         start a while loop that sends 'command' to tello every 5 second
         """
         while not self.is_program_end:
-                self.tello.send_command('command')
-                time.sleep(5)
-                               
+            self.tello.send_command('command')
+            time.sleep(5)
+
         self.onClose()
 
-    def _setQuitWaitingFlag(self):  
+    def _setQuitWaitingFlag(self):
         """
-        set the variable as TRUE,it will stop computer waiting for response from tello  
-        """       
-        self.quit_waiting_flag = True        
-   
+        set the variable as TRUE,it will stop computer waiting for response from tello
+        """
+        self.quit_waiting_flag = True
+
     def openCmdWindow(self):
         """
         open the cmd window and initial all the button and text
-        """        
+        """
         panel = Toplevel(self.root)
         panel.wm_title("Command Panel")
 
@@ -176,10 +178,10 @@ class TelloUI:
         text0.pack(side='top')
 
         text1 = tki.Label(panel, text=
-                          'W - Move Tello Up\t\t\tArrow Up - Move Tello Forward\n'
-                          'S - Move Tello Down\t\t\tArrow Down - Move Tello Backward\n'
-                          'A - Rotate Tello Counter-Clockwise\tArrow Left - Move Tello Left\n'
-                          'D - Rotate Tello Clockwise\t\tArrow Right - Move Tello Right',
+        'W - Move Tello Up\t\t\tArrow Up - Move Tello Forward\n'
+        'S - Move Tello Down\t\t\tArrow Down - Move Tello Backward\n'
+        'A - Rotate Tello Counter-Clockwise\tArrow Left - Move Tello Left\n'
+        'D - Rotate Tello Clockwise\t\tArrow Right - Move Tello Right',
                           justify="left")
         text1.pack(side="top")
 
@@ -234,7 +236,7 @@ class TelloUI:
         """
         open the flip window and initial all the button and text
         """
-        
+
         panel = Toplevel(self.root)
         panel.wm_title("Gesture Recognition")
 
@@ -257,7 +259,7 @@ class TelloUI:
             panel, text="Flip Backward", relief="raised", command=self.telloFlip_b)
         self.btn_flipb.pack(side="bottom", fill="both",
                             expand="yes", padx=10, pady=5)
-       
+
     def takeSnapshot(self):
         """
         save the current frame of the video as a jpg file and put it into outputpath
@@ -273,7 +275,6 @@ class TelloUI:
         cv2.imwrite(p, cv2.cvtColor(self.frame, cv2.COLOR_RGB2BGR))
         print("[INFO] saved {}".format(filename))
 
-
     def pauseVideo(self):
         """
         Toggle the freeze/unfreze of video
@@ -286,7 +287,7 @@ class TelloUI:
             self.tello.video_freeze(True)
 
     def telloTakeOff(self):
-        return self.tello.takeoff()                
+        return self.tello.takeoff()
 
     def telloLanding(self):
         return self.tello.land()
@@ -338,7 +339,6 @@ class TelloUI:
         self.degree = self.degree_bar.get()
         print 'reset distance to %d' % self.degree
 
-
     def on_keypress_w(self, event):
         print "up %d m" % self.distance
         self.telloUp(self.distance)
@@ -379,7 +379,7 @@ class TelloUI:
     def onClose(self):
         """
         set the stop event, cleanup the camera, and allow the rest of
-        
+
         the quit process to continue
         """
         print("[INFO] closing...")
@@ -388,21 +388,26 @@ class TelloUI:
         self.root.quit()
 
     def call_back(self):
-        #if abs(ball_x - medium) < small_vis:
-         #   if 0.1 < abs(rotate) < 0.3:
-          #      state_value = state['rotate_until_zero']
-           # if abs(rotate) < 0.1:
-            #    state_value = state['follow_and_push_with_back']
-
         self.state_to_call[self.state_value]()
 
-    def commandProcess(self,image):
+    def record_image(self, image):
+        if self.is_img_record:
+            img_name = str(self.img_num)
+            img_name = img_name.zfill(6) + '.jpg'
+            p = os.path.sep.join((self.outputPath, img_name))
+            self.img_num += 1
+            # save the file
+            cv2.imwrite(p, cv2.cvtColor(self.frame, cv2.COLOR_RGB2BGR))
 
-        ball_x,ball_y,distance = self.imageProcess(image)
-        #self.call_back()
-        #print('not define')
+    def commandProcess(self, image):
 
-    def imageProcess(self,image):
+        self.ball_x, self.ball_y, self.distance = self.imageProcess(image)
+
+        self.record_image(image)
+        # self.call_back()
+        # print('not define')
+
+    def imageProcess(self, image):
         lmin = 30;
         lmax = 100;
 
@@ -412,30 +417,28 @@ class TelloUI:
         bmin = 130;
         bmax = 170;
 
-
-
         redLower = np.array([lmin, amin, bmin])
         redUpper = np.array([lmax, amax, bmax])
 
         img = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
-        print ('image x = %s, y = %s' %(img.shape[0],img.shape[1]))
+        # print ('image x = %s, y = %s' %(img.shape[0],img.shape[1]))
         frame_lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
         red = cv2.inRange(frame_lab, redLower, redUpper)
         red = cv2.erode(red, None, iterations=8)
-        #red = cv2.dilate(red, None, iterations=10)
+        # red = cv2.dilate(red, None, iterations=10)
 
-        ball_x,ball_y,distance = self.findBall(red,frame_lab)
+        ball_x, ball_y, distance = self.findBall(red, frame_lab)
         if self.show_image:
             cv2.imshow("OpenCV", img)
             cv2.imshow('red in range', red)
             cv2.waitKey(30)
-        return ball_x,ball_y,distance
+        return ball_x, ball_y, distance
 
-    def findBall(self,red,img):
+    def findBall(self, red, img):
 
         radius2distance = 59.4
 
-        _,contours_ball,_ = cv2.findContours(red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        _, contours_ball, _ = cv2.findContours(red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         res = np.zeros_like(img)
         ball_x = ball_y = radius = -1
         if len(contours_ball) > 0:
@@ -450,29 +453,30 @@ class TelloUI:
                 cv2.circle(res, center, radius, (0, 0, 255), -1)
         if self.show_image:
             cv2.imshow("c", res)
-            if radius>0:
-                dist_real = radius2distance/(1.0*radius)
+            if radius > 0:
+                dist_real = radius2distance / (1.0 * radius)
             else:
                 dist_real = radius
-            print("ball_x=%s \n ball_y = %s \n ball_rp=%s \n ball_r = %s" % (ball_x, ball_y, radius,dist_real))
+            print("ball_x=%s \n ball_y = %s \n ball_rp=%s \n ball_r = %s" % (ball_x, ball_y, radius, dist_real))
 
-        return ball_x,ball_y,dist_real
+        return ball_x, ball_y, dist_real
 
     def take_off(self):
-        #self.tello.land()
+        # self.tello.land()
         if (self.tello.get_response() == 'ok'
-            and self.is_takeoff == False) :
+                and self.is_takeoff == False):
             self.tello.takeoff()
             self.take_off_time = time.time()
             self.is_takeoff = True
         elif self.is_takeoff == False:
             print(self.tello.get_response())
-        elif (self.tello.get_response() == 'ok'and
+        elif (self.tello.get_response() == 'ok' and
               time.time() - self.take_off_time >= 2):
             self.state_value = self.state['fly_up']
-            #self.tello.land()
+            # self.tello.land()
             print('transfer 2 fly up')
         print('take off')
+
     def fly_up(self):
         if self.is_cmd_send == False:
             self.tello.move_forward(1)
@@ -482,22 +486,33 @@ class TelloUI:
             self.tello.land()
             self.state_value = self.state['find_ball']
         print('fly_up')
+
     def find_ball(self):
-        #self.tello.land()
+        # self.tello.land()
         print('find_ball')
+
     def roll_to_ball(self):
         self.tello.land()
         print('roll_to_ball')
+
     def fly_straight(self):
         self.tello.land()
         print('fly_stright')
+
     def fly_finish(self):
         print('fly_finish')
 
-        #self.state = {'take_off': 0, 'fly_up': 1, 'find_ball': 2,
-         #             'roll_to_ball': 3, 'fly_straight': 4, 'fly_finish': 5}
-    def onKey(self,event):
+        # self.state = {'take_off': 0, 'fly_up': 1, 'find_ball': 2,
+        #             'roll_to_ball': 3, 'fly_straight': 4, 'fly_finish': 5}
+
+    def onKey(self, event):
         # press q to stop the programme
         if event.char == 'q':
             self.onClose()
             self.is_program_end = True
+        if event.char == 's':
+            self.is_img_record = True
+            print('record img start')
+        if event.char == 'p':
+            print('record img pause')
+            self.is_img_record = False
