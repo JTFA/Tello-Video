@@ -31,8 +31,10 @@ class Tello:
         self.last_frame = None
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # socket for sending cmd
         self.socket_video = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # socket for receiving video stream
+        self.socket_state = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # socket for receiving state stream
         self.tello_address = (tello_ip, tello_port)
         self.local_video_port = 11111  # port for receiving video stream
+        self.state_port = 8890
         self.last_height = 0
         self.socket.bind((local_ip, local_port))
 
@@ -50,17 +52,35 @@ class Tello:
 
         self.socket_video.bind((local_ip, self.local_video_port))
 
+
         # thread for receiving video
         self.receive_video_thread = threading.Thread(target=self._receive_video_thread)
         self.receive_video_thread.daemon = True
 
         self.receive_video_thread.start()
 
+        #thread for receiving tello state
+        self.socket_state.bind((local_ip, self.state_port))
+        self.state_str = ""
+        self.receive_state_thread = threading.Thread(target=self._receive_state_thread)
+        self.receive_state_thread.daemon = True
+
+        self.receive_state_thread.start()
+
+        #tello state variable
+        self.roll = 0
+        self.pitch = 0
+        self.yaw = 0
+        self.tof = 0
+        self.baro = 0
+
+
     def __del__(self):
         """Closes the local socket."""
 
         self.socket.close()
         self.socket_video.close()
+        self.socket_state.close()
     
     def read(self):
         """Return the last frame from camera."""
@@ -84,7 +104,6 @@ class Tello:
         while True:
             try:
                 self.response, ip = self.socket.recvfrom(3000)
-                #print(self.response)
             except socket.error as exc:
                 print ("Caught exception socket.error : %s" % exc)
 
@@ -108,7 +127,20 @@ class Tello:
 
             except socket.error as exc:
                 print ("Caught exception socket.error : %s" % exc)
-    
+
+    def _receive_state_thread(self):
+        '''
+        receive state from tello
+        :return:
+        '''
+        self.state_str = ""
+        while True:
+            try:
+                self.state_str, ip = self.socket_state.recvfrom(4000)
+                #print(len(self.state_str))
+                time.sleep(0.02)
+            except socket.error as exc:
+                print ("Caught exception socket.error : %s" % exc)
     def _h264_decode(self, packet_data):
         """
         decode raw h264 format data from Tello
@@ -315,6 +347,13 @@ class Tello:
 
         return flight_time
 
+    def get_yaw(self):
+        '''
+
+        :return: degree of yaw angle
+        '''
+        yaw_angle = self.send_command('yaw?')
+        return yaw_angle
     def get_speed(self):
         """Returns the current speed.
 
@@ -457,3 +496,24 @@ class Tello:
         """
 
         return self.move('up', distance)
+    def stop(self):
+        return self.send_command('stop')
+    def prase_state(self):
+        '''
+        prase state value from str
+        :param state_str: state str received from tello
+        :return: none
+        '''
+        if len(self.state_str) == 0:
+            print('empty state')
+            return
+        state_set = self.state_str.split(';')
+        print (state_set)
+        self.pitch = state_set[5].split(':')[1]
+        self.roll = state_set[6].split(':')[1]
+        self.yaw = state_set[7].split(':')[1]
+        self.tof = state_set[13].split(':')[1]
+        self.baro = state_set[16].split(':')[1]
+        print(self.tof)
+    def get_tof(self):
+        return self.tof

@@ -49,6 +49,8 @@ class TelloUI:
         self.take_off_time = 0
         self.is_takeoff = False
         self.is_cmd_send = False
+        self.show_image = False
+
 
         self.ball_x = -1
         self.ball_y = -1
@@ -62,7 +64,7 @@ class TelloUI:
 
         # if the flag is TRUE,the auto-takeoff thread will stop waiting for the response from tello
         self.quit_waiting_flag = False
-        self.show_image = True
+
         # initialize the root window and image panel
         self.root = tki.Tk()
         self.panel = None
@@ -88,6 +90,8 @@ class TelloUI:
         self.thread = threading.Thread(target=self.videoLoop, args=())
         self.thread.start()
 
+
+
         # set a key event
         self.root.bind('<Key>', self.onKey)
         # set a callback to handle when the window is closed
@@ -109,7 +113,7 @@ class TelloUI:
             self.sending_command_thread.start()
             while (not self.stopEvent.is_set()) and (not self.is_program_end):
                 system = platform.system()
-                print(self.is_program_end)
+               # print(self.is_program_end)
                 # read the frame for GUI show
                 self.frame = self.tello.read()
                 if self.frame is None or self.frame.size == 0:
@@ -383,6 +387,7 @@ class TelloUI:
         the quit process to continue
         """
         print("[INFO] closing...")
+        self.tello.land()
         self.stopEvent.set()
         del self.tello
         self.root.quit()
@@ -400,22 +405,41 @@ class TelloUI:
             cv2.imwrite(p, cv2.cvtColor(self.frame, cv2.COLOR_RGB2BGR))
 
     def commandProcess(self, image):
-
+        '''
+        run for judge image and send command
+        :param image: image from tello in h264
+        :return: none
+        '''
+        #check if has enough power
+        '''
+        bat = self.tello.get_battery()
+        if bat <= 10:
+            print('low power')
+            self.onClose()
+            self.is_program_end = True
+            return
+        '''
+        self.tello.prase_state()
+        # process image to find the ball position in pielx
+        # and real distance in meter
         self.ball_x, self.ball_y, self.distance = self.imageProcess(image)
-
+        #record image
         self.record_image(image)
-        # self.call_back()
-        # print('not define')
+
+        self.tello.get_tof()
+
+        ##state machine of action
+        #self.call_back()
 
     def imageProcess(self, image):
-        lmin = 30;
-        lmax = 100;
+        lmin = 0#30;
+        lmax = 162#100;
 
-        amin = 150;
-        amax = 200;
+        amin = 150#150;
+        amax = 255#200;
 
-        bmin = 130;
-        bmax = 170;
+        bmin = 118#130;
+        bmax = 255#170;
 
         redLower = np.array([lmin, amin, bmin])
         redUpper = np.array([lmax, amax, bmax])
@@ -436,11 +460,12 @@ class TelloUI:
 
     def findBall(self, red, img):
 
-        radius2distance = 59.4
+        radius2distance = 67.5#59.4
 
-        _, contours_ball, _ = cv2.findContours(red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        contours_ball, _ = cv2.findContours(red, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         res = np.zeros_like(img)
-        ball_x = ball_y = radius = -1
+        ball_x = ball_y = radius = dist_real = -1
+
         if len(contours_ball) > 0:
             contours_ball.sort(key=lambda x: len(x))
             cnt = contours_ball[-1]
@@ -451,13 +476,14 @@ class TelloUI:
                 center = (int(x), int(y))
                 radius = int(radius)
                 cv2.circle(res, center, radius, (0, 0, 255), -1)
-        if self.show_image:
-            cv2.imshow("c", res)
             if radius > 0:
                 dist_real = radius2distance / (1.0 * radius)
             else:
                 dist_real = radius
-            print("ball_x=%s \n ball_y = %s \n ball_rp=%s \n ball_r = %s" % (ball_x, ball_y, radius, dist_real))
+        if self.show_image:
+            cv2.imshow("c", res)
+
+            print("ball_x=%s \n ball_y = %s \n ball_rp=%s \n real_r = %s" % (ball_x, ball_y, radius, dist_real))
 
         return ball_x, ball_y, dist_real
 
@@ -468,31 +494,52 @@ class TelloUI:
             self.tello.takeoff()
             self.take_off_time = time.time()
             self.is_takeoff = True
-        elif self.is_takeoff == False:
-            print(self.tello.get_response())
-        elif (self.tello.get_response() == 'ok' and
-              time.time() - self.take_off_time >= 2):
+        elif (self.tello.get_response() == 'ok') and (time.time() - self.take_off_time >= 2):
             self.state_value = self.state['fly_up']
             # self.tello.land()
             print('transfer 2 fly up')
         print('take off')
 
     def fly_up(self):
+        #0.85m
+        target_height = 0.85
+        height = self.tello.get_height()/10.0
+        delt_height = target_height - height
+        print(height)
+
+            #self.state_value = self.state['find_ball']
+
+
         if self.is_cmd_send == False:
-            self.tello.move_forward(1)
+            self.tello.move_up(target_height)
             self.is_cmd_send = True
-        if (self.tello.get_response() == 'ok') and (self.is_cmd_send == True):
+        if (self.tello.get_response() == 'ok')and(self.is_cmd_send == True):
+
             self.is_cmd_send = False
+            #self.tello.land()
+        if delt_height <= 0.03:
             self.tello.land()
             self.state_value = self.state['find_ball']
         print('fly_up')
 
     def find_ball(self):
-        # self.tello.land()
+        #print(self.tello.get_yaw())
+        if self.ball_x >0 and self.ball_y > 0 and self.distance > 0:
+            self.state_value = self.state['roll_to_ball']
+
+        if self.is_cmd_send == False:
+            self.tello.land()
+            #self.tello.rotate_ccw(45)
+            self.is_cmd_send = True
+
         print('find_ball')
 
     def roll_to_ball(self):
-        self.tello.land()
+       # print(self.tello.get_yaw())
+        if self.is_cmd_send == False:
+            self.tello.land()
+            # self.tello.rotate_ccw(45)
+            self.is_cmd_send = True
         print('roll_to_ball')
 
     def fly_straight(self):
