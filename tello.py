@@ -508,12 +508,40 @@ class Tello:
             print('empty state')
             return
         state_set = self.state_str.split(';')
-        print (state_set)
-        self.pitch = state_set[5].split(':')[1]
-        self.roll = state_set[6].split(':')[1]
-        self.yaw = state_set[7].split(':')[1]
-        self.tof = state_set[13].split(':')[1]
-        self.baro = state_set[16].split(':')[1]
-        print(self.tof)
+        #print (state_set)
+        self.pitch = int(state_set[5].split(':')[1])
+        self.roll = int(state_set[6].split(':')[1])
+        self.yaw = int(state_set[7].split(':')[1])
+        self.tof = int(state_set[13].split(':')[1])/100.0
+        self.baro = float(state_set[16].split(':')[1])/100.0
+        #print(self.tof)
     def get_tof(self):
+        '''
+
+        :return: tof in meter
+        '''
         return self.tof
+    def get_roll(self):
+        '''
+
+        :return: roll angle in deg
+        '''
+        return self.roll
+    def get_pitch(self):
+        '''
+
+        :return:pitch angle in deg
+        '''
+        return self.pitch
+    def get_yaw(self):
+        '''
+
+        :return:yaw angle in deg
+        '''
+        return self.yaw
+    def get_baro(self):
+        '''
+
+        :return: baro height in meters
+        '''
+        return self.baro

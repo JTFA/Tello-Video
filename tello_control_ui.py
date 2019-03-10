@@ -39,7 +39,7 @@ class TelloUI:
         # control variables
         self.distance = 0.1  # default distance for 'move' cmd
         self.degree = 30  # default degree for 'cw' or 'ccw' cmd
-
+        self.target_angle = 0 #target angle when rotate
         # state variables
         self.state = {'take_off': 0, 'fly_up': 1, 'find_ball': 2,
                       'roll_to_ball': 3, 'fly_straight': 4, 'fly_finish': 5}
@@ -49,7 +49,7 @@ class TelloUI:
         self.take_off_time = 0
         self.is_takeoff = False
         self.is_cmd_send = False
-        self.show_image = False
+        self.show_image = True
 
 
         self.ball_x = -1
@@ -156,6 +156,11 @@ class TelloUI:
         """
         while not self.is_program_end:
             self.tello.send_command('command')
+            bat = self.tello.get_battery()
+            if bat <= 10:
+                print('low power')
+                self.is_program_end = True
+                break
             time.sleep(5)
 
         self.onClose()
@@ -411,14 +416,7 @@ class TelloUI:
         :return: none
         '''
         #check if has enough power
-        '''
-        bat = self.tello.get_battery()
-        if bat <= 10:
-            print('low power')
-            self.onClose()
-            self.is_program_end = True
-            return
-        '''
+
         self.tello.prase_state()
         # process image to find the ball position in pielx
         # and real distance in meter
@@ -426,10 +424,8 @@ class TelloUI:
         #record image
         self.record_image(image)
 
-        self.tello.get_tof()
-
         ##state machine of action
-        #self.call_back()
+        self.call_back()
 
     def imageProcess(self, image):
         lmin = 0#30;
@@ -489,8 +485,7 @@ class TelloUI:
 
     def take_off(self):
         # self.tello.land()
-        if (self.tello.get_response() == 'ok'
-                and self.is_takeoff == False):
+        if (self.is_takeoff == False):
             self.tello.takeoff()
             self.take_off_time = time.time()
             self.is_takeoff = True
@@ -503,7 +498,7 @@ class TelloUI:
     def fly_up(self):
         #0.85m
         target_height = 0.85
-        height = self.tello.get_height()/10.0
+        height = self.tello.get_tof()
         delt_height = target_height - height
         print(height)
 
@@ -514,11 +509,9 @@ class TelloUI:
             self.tello.move_up(target_height)
             self.is_cmd_send = True
         if (self.tello.get_response() == 'ok')and(self.is_cmd_send == True):
-
             self.is_cmd_send = False
-            #self.tello.land()
         if delt_height <= 0.03:
-            self.tello.land()
+            #self.tello.land()
             self.state_value = self.state['find_ball']
         print('fly_up')
 
@@ -528,25 +521,58 @@ class TelloUI:
             self.state_value = self.state['roll_to_ball']
 
         if self.is_cmd_send == False:
-            self.tello.land()
-            #self.tello.rotate_ccw(45)
+            #self.tello.land()
+            self.tello.rotate_ccw(45)
             self.is_cmd_send = True
 
         print('find_ball')
 
     def roll_to_ball(self):
        # print(self.tello.get_yaw())
-        if self.is_cmd_send == False:
-            self.tello.land()
-            # self.tello.rotate_ccw(45)
+        delt_roll = self.middle_x - self.ball_x
+        print ('delt_roll %s'%delt_roll)
+
+        if abs(delt_roll) <= 10:
+            self.tello.stop()
+            self.target_angle = self.tello.get_yaw()
+            self.is_cmd_send = False
+            self.state_value = self.state['fly_straight']
+        elif self.is_cmd_send == False:
+            #self.tello.land()
+            if(delt_roll>0):
+                self.tello.rotate_cw(10)
+            else:
+                self.tello.rotate_ccw(10)
             self.is_cmd_send = True
+        elif (self.tello.get_response() == 'ok')and(self.is_cmd_send == True):
+            self.is_cmd_send = False
+
         print('roll_to_ball')
 
     def fly_straight(self):
-        self.tello.land()
+        if abs(delt_roll) > 20:
+            self.state_value = self.state['roll_to_ball']
+            self.is_cmd_send = False
+        elif self.distance <=0.5:
+            self.state_value = self.state['fly_finish']
+            self.is_cmd_send = False
+
+        elif self.is_cmd_send == False :
+            fly_dist = self.distance
+            if fly_dist >= 5:
+                fly_dist = 5
+            #if(self.distance <= 1.5)
+            self.tello.move_forward(fly_dist)
+
+            self.is_cmd_send = True
+        elif (self.tello.get_response() == 'ok')and(self.is_cmd_send == True):
+            self.is_cmd_send = False
         print('fly_stright')
 
     def fly_finish(self):
+        if self.is_cmd_send == False:
+            self.tello.land()
+            self.is_cmd_send = True
         print('fly_finish')
 
         # self.state = {'take_off': 0, 'fly_up': 1, 'find_ball': 2,

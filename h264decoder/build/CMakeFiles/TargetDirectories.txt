@@ -1,7 +1,0 @@
-/home/xindong324/PycharmProjects/tello/Tello-Python/Tello_Video/h264decoder/build/CMakeFiles/install/strip.dir
-/home/xindong324/PycharmProjects/tello/Tello-Python/Tello_Video/h264decoder/build/CMakeFiles/install/local.dir
-/home/xindong324/PycharmProjects/tello/Tello-Python/Tello_Video/h264decoder/build/CMakeFiles/install.dir
-/home/xindong324/PycharmProjects/tello/Tello-Python/Tello_Video/h264decoder/build/CMakeFiles/list_install_components.dir
-/home/xindong324/PycharmProjects/tello/Tello-Python/Tello_Video/h264decoder/build/CMakeFiles/rebuild_cache.dir
-/home/xindong324/PycharmProjects/tello/Tello-Python/Tello_Video/h264decoder/build/CMakeFiles/edit_cache.dir
-/home/xindong324/PycharmProjects/tello/Tello-Python/Tello_Video/h264decoder/build/CMakeFiles/h264decoder.dir
