@@ -163,6 +163,34 @@ class Tello:
 
         return res_frame_list
 
+
+    def send_command_without_return(self, command):
+        """Send command to Tello without expecting a response. Use this method when you want to send a command
+        continuously
+            - go x y z speed: Tello fly to x y z in speed (cm/s)
+                x: 20-500
+                y: 20-500
+                z: 20-500
+                speed: 10-100
+            - curve x1 y1 z1 x2 y2 z2 speed: Tello fly a curve defined by the current and two given coordinates with
+                speed (cm/s). If the arc radius is not within the range of 0.5-10 meters, it responses false.
+                x/y/z can’t be between -20 – 20 at the same time .
+                x1, x2: 20-500
+                y1, y2: 20-500
+                z1, z2: 20-500
+                speed: 10-60
+            - rc a b c d: Send RC control via four channels.
+                a: left/right (-100~100)
+                b: forward/backward (-100~100)
+                c: up/down (-100~100)
+                d: yaw (-100~100)
+        """
+        # Commands very consecutive makes the drone not respond to them. So wait at least self.TIME_BTW_COMMANDS seconds
+
+        print('Send command (no expect response): ' + command)
+        self.socket.sendto(command.encode('utf-8'), self.address)
+
+
     def send_command(self, command):
         """
         Send a command to the Tello and wait for a response.
@@ -545,3 +573,22 @@ class Tello:
         :return: baro height in meters
         '''
         return self.baro
+
+    @accepts(left_right_velocity=int, forward_backward_velocity=int, up_down_velocity=int, yaw_velocity=int)
+    def send_rc_control(self, left_right_velocity, forward_backward_velocity, up_down_velocity, yaw_velocity):
+        """Send RC control via four channels. Command is sent every self.TIME_BTW_RC_CONTROL_COMMANDS seconds.
+        Arguments:
+            left_right_velocity: -100~100 (left/right)
+            forward_backward_velocity: -100~100 (forward/backward)
+            up_down_velocity: -100~100 (up/down)
+            yaw_velocity: -100~100 (yaw)
+        Returns:
+            bool: True for successful, False for unsuccessful
+        """
+        if int(time.time() * 1000) - self.last_rc_control_sent < self.TIME_BTW_RC_CONTROL_COMMANDS:
+            pass
+        else:
+            self.last_rc_control_sent = int(time.time() * 1000)
+            return self.send_command_without_return('rc %s %s %s %s' % (left_right_velocity, forward_backward_velocity,
+                                                                        up_down_velocity, yaw_velocity))
+
