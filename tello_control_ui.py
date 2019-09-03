@@ -109,6 +109,7 @@ class TelloUI:
         """
         try:
             # start the thread that get GUI image and drwa skeleton
+
             time.sleep(0.5)
             self.sending_command_thread.start()
             while (not self.stopEvent.is_set()) and (not self.is_program_end):

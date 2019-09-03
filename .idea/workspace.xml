@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1d82da41-042a-461e-8a3e-aad3bf385b52" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/PID.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/djitellopy/tello.py" beforeDir="false" afterPath="$PROJECT_DIR$/djitellopy/tello.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tello.py" beforeDir="false" afterPath="$PROJECT_DIR$/tello.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tello_control_ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/tello_control_ui.py" afterDir="false" />
     </list>
@@ -35,8 +36,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../TelloTV/TelloTV.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="351">
-              <caret line="91" column="48" lean-forward="true" selection-start-line="91" selection-start-column="21" selection-end-line="91" selection-end-column="48" />
+            <state relative-caret-position="-863">
+              <caret line="91" column="48" selection-start-line="91" selection-start-column="21" selection-end-line="91" selection-end-column="48" />
               <folding>
                 <element signature="e#0#28#0" expanded="true" />
               </folding>
@@ -44,27 +45,23 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/djitellopy/tello.py">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/PID.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-409">
-              <caret line="87" column="32" selection-start-line="87" selection-start-column="8" selection-end-line="87" selection-end-column="32" />
+            <state relative-caret-position="405">
+              <caret line="86" lean-forward="true" selection-start-line="86" selection-end-line="86" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/../TelloTV/djitellopy/decorators.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-424" />
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tello_control_ui.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2817">
-              <caret line="193" column="26" selection-start-line="193" selection-start-column="26" selection-end-line="193" selection-end-column="26" />
+            <state relative-caret-position="3510">
+              <caret line="136" column="49" lean-forward="true" selection-start-line="136" selection-start-column="49" selection-end-line="136" selection-end-column="49" />
               <folding>
                 <element signature="e#0#21#0" expanded="true" />
               </folding>
@@ -75,7 +72,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lab_debug.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="144">
+            <state relative-caret-position="162">
               <caret line="7" column="24" selection-start-line="7" selection-start-column="24" selection-end-line="7" selection-end-column="24" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
@@ -87,13 +84,35 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="28" selection-start-column="28" selection-end-column="28" />
+            <state relative-caret-position="297">
+              <caret line="11" column="3" selection-start-line="11" selection-start-column="3" selection-end-line="11" selection-end-column="3" />
+              <folding>
+                <element signature="e#0#28#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/tello.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="414">
+              <caret line="578" column="82" selection-start-line="578" selection-start-column="82" selection-end-line="578" selection-end-column="82" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
     </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -105,6 +124,7 @@
       <find>get_h</find>
       <find>videoLoop</find>
       <find>read</find>
+      <find>time()</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -115,10 +135,11 @@
       <list>
         <option value="$PROJECT_DIR$/tello_test.py" />
         <option value="$PROJECT_DIR$/lab_debug.py" />
-        <option value="$PROJECT_DIR$/tello.py" />
         <option value="$PROJECT_DIR$/main.py" />
-        <option value="$PROJECT_DIR$/djitellopy/tello.py" />
         <option value="$PROJECT_DIR$/tello_control_ui.py" />
+        <option value="$PROJECT_DIR$/djitellopy/tello.py" />
+        <option value="$PROJECT_DIR$/tello.py" />
+        <option value="$PROJECT_DIR$/PID.py" />
       </list>
     </option>
   </component>
@@ -134,7 +155,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -142,20 +162,16 @@
               <item name="Tello-Video" type="b2602c69:ProjectViewProjectNode" />
               <item name="Tello-Video" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="Tello-Video" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Tello-Video" type="462c0819:PsiDirectoryNode" />
-              <item name="djitellopy" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Tello-Video-Without-UI" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
@@ -248,21 +264,29 @@
       <workItem from="1552111032923" duration="8725000" />
       <workItem from="1552161745001" duration="16615000" />
       <workItem from="1561030725111" duration="1628000" />
+      <workItem from="1561730025028" duration="599000" />
+      <workItem from="1561967235301" duration="599000" />
+      <workItem from="1564721411863" duration="13000" />
+      <workItem from="1565241274431" duration="2000" />
+      <workItem from="1565265171147" duration="599000" />
+      <workItem from="1565853586765" duration="599000" />
+      <workItem from="1567472728900" duration="332000" />
+      <workItem from="1567473790337" duration="5152000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="46248000" />
+    <option name="totallyTimeSpent" value="54143000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.28518122" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.3139659" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Find" order="1" visible="true" weight="0.329718" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.329718" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -322,16 +346,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/tello.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15984">
-          <caret line="592" column="11" selection-start-line="592" selection-start-column="11" selection-end-line="592" selection-end-column="11" />
-          <folding>
-            <element signature="e#0#13#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tello_test.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="351">
@@ -342,33 +356,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../TelloTV/djitellopy/decorators.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-424" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lab_debug.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="7" column="24" selection-start-line="7" selection-start-column="24" selection-end-line="7" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../TelloTV/djitellopy/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../TelloTV/TelloTV.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
-          <caret line="91" column="48" lean-forward="true" selection-start-line="91" selection-start-column="21" selection-end-line="91" selection-end-column="48" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../TelloTV/djitellopy/tello.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -377,26 +366,72 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
+    <entry file="file://$PROJECT_DIR$/lab_debug.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="28" selection-start-column="28" selection-end-column="28" />
+        <state relative-caret-position="162">
+          <caret line="7" column="24" selection-start-line="7" selection-start-column="24" selection-end-line="7" selection-end-column="24" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/djitellopy/tello.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-409">
-          <caret line="87" column="32" selection-start-line="87" selection-start-column="8" selection-end-line="87" selection-end-column="32" />
+        <state relative-caret-position="553">
+          <caret line="486" column="58" lean-forward="true" selection-start-line="481" selection-start-column="4" selection-end-line="486" selection-end-column="58" />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="297">
+          <caret line="11" column="3" selection-start-line="11" selection-start-column="3" selection-end-line="11" selection-end-column="3" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../TelloTV/djitellopy/decorators.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/tello_control_ui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2817">
-          <caret line="193" column="26" selection-start-line="193" selection-start-column="26" selection-end-line="193" selection-end-column="26" />
+        <state relative-caret-position="3510">
+          <caret line="136" column="49" lean-forward="true" selection-start-line="136" selection-start-column="49" selection-end-line="136" selection-end-column="49" />
           <folding>
             <element signature="e#0#21#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tello.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="414">
+          <caret line="578" column="82" selection-start-line="578" selection-start-column="82" selection-end-line="578" selection-end-column="82" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../TelloTV/TelloTV.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-863">
+          <caret line="91" column="48" selection-start-line="91" selection-start-column="21" selection-end-line="91" selection-end-column="48" />
+          <folding>
+            <element signature="e#0#28#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PID.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="86" lean-forward="true" selection-start-line="86" selection-end-line="86" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>

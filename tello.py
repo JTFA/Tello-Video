@@ -592,3 +592,72 @@ class Tello:
             return self.send_command_without_return('rc %s %s %s %s' % (left_right_velocity, forward_backward_velocity,
                                                                         up_down_velocity, yaw_velocity))
 
+    @accepts(forward_backward_velocity=int)
+    def send_up_down_rc_control(self, forward_backward_velocity):
+        """Send RC control via four channels. Command is sent every self.TIME_BTW_RC_CONTROL_COMMANDS seconds.
+                Arguments:
+                    forward_backward_velocity: -100~100 (forward/backward)
+                   
+                Returns:
+                    bool: True for successful, False for unsuccessful
+                """
+        if int(time.time() * 1000) - self.last_rc_control_sent < self.TIME_BTW_RC_CONTROL_COMMANDS:
+            pass
+        else:
+            self.last_rc_control_sent = int(time.time() * 1000)
+            return self.send_command_without_return('rc %s %s %s %s' % (0, forward_backward_velocity,
+                                                                        0, 0))
+
+    @accepts(up_down_velocity=int)
+    def send_up_down_rc_control(self,up_down_velocity):
+        """Send RC control via four channels. Command is sent every self.TIME_BTW_RC_CONTROL_COMMANDS seconds.
+                Arguments:
+                    up_down_velocity: -100~100 (up/down)
+
+                Returns:
+                    bool: True for successful, False for unsuccessful
+                """
+        if int(time.time() * 1000) - self.last_rc_control_sent < self.TIME_BTW_RC_CONTROL_COMMANDS:
+            pass
+        else:
+            self.last_rc_control_sent = int(time.time() * 1000)
+            return self.send_command_without_return('rc %s %s %s %s' % (0, 0,
+                                                                        up_down_velocity, 0))
+
+    @accepts(left_right_velocity=int)
+    def send_left_right_rc_control(self, left_right_velocity):
+        """Send RC control via four channels. Command is sent every self.TIME_BTW_RC_CONTROL_COMMANDS seconds.
+                Arguments:
+                    left_right_velocity: -100~100 (left/right)
+
+                Returns:
+                    bool: True for successful, False for unsuccessful
+                """
+        if int(time.time() * 1000) - self.last_rc_control_sent < self.TIME_BTW_RC_CONTROL_COMMANDS:
+            pass
+        else:
+            self.last_rc_control_sent = int(time.time() * 1000)
+            return self.send_command_without_return('rc %s %s %s %s' % (left_right_velocity, 0,
+                                                                        0, 0))
+
+    @accepts(yaw_velocity=int)
+    def send_up_down_rc_control(self, yaw_velocity):
+        """Send RC control via four channels. Command is sent every self.TIME_BTW_RC_CONTROL_COMMANDS seconds.
+                Arguments:
+                    yaw_velocity: -100~100 (yaw)
+                Returns:
+                    bool: True for successful, False for unsuccessful
+                """
+        if int(time.time() * 1000) - self.last_rc_control_sent < self.TIME_BTW_RC_CONTROL_COMMANDS:
+            pass
+        else:
+            self.last_rc_control_sent = int(time.time() * 1000)
+            return self.send_command_without_return('rc %s %s %s %s' % (0, 0,
+                                                                        0, yaw_velocity))
+
+    def set_wifi_with_ssid_password(self):
+        """Set Wi-Fi with SSID password.
+        Returns:
+            bool: True for successful, False for unsuccessful
+        """
+        return self.send_control_command('wifi ssid pass')
